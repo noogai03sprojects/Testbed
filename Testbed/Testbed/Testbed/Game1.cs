@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using System.IO;
+using System.Diagnostics;
 
 namespace Testbed
 {
@@ -24,10 +26,19 @@ namespace Testbed
 
         bool bSelectingTest = false;
 
+        int currentTest = 0;
+
+        KeyboardState oldState;
+
+        string prefsPath = "prefs";
+
+        public static Game1 Instance;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            Instance = this;
         }
 
         /// <summary>
@@ -39,15 +50,31 @@ namespace Testbed
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            Art.LoadContent(Content, this);
             Testbed = new Testbed(this);
 
-            
+            oldState = Keyboard.GetState();
 
             //Testbed.AddTest(new TestEntry
-
+            //DirectoryInfo info = new DirectoryInfo(Environment.CurrentDirectory);
+            //if (info.
+            
+            //this.OnExiting()
+            //Environment.
+            //base.Exiting += Exiting;
             base.Initialize();
+        }        
+        
+        protected override void OnExiting(object sender, EventArgs args)
+        {
+            using (StreamWriter writer = new StreamWriter(prefsPath, false))
+            {
+                writer.Write(currentTest);
+            }
+            Debug.WriteLine("unload");
+            base.OnExiting(sender, args);
         }
+
 
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
@@ -59,7 +86,19 @@ namespace Testbed
             spriteBatch = new SpriteBatch(GraphicsDevice);
             primBatch = new PrimitiveBatch(GraphicsDevice);
 
-            Testbed.StartTest(1);
+            Testbed.LoadContent(Content);
+
+            if (File.Exists(prefsPath))
+            {
+                using (StreamReader reader = new StreamReader(prefsPath))
+                {
+                    int test = Convert.ToInt32(reader.ReadToEnd());
+                    Testbed.StartTest(test);
+                    currentTest = test;
+                }
+            }
+            else
+                Testbed.StartTest(0);
             // TODO: use this.Content to load your game content here
         }
 
@@ -70,8 +109,10 @@ namespace Testbed
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
-        }
-
+            
+        }        
+       
+        //override 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -83,10 +124,28 @@ namespace Testbed
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
+            KeyboardState newState = Keyboard.GetState();
+            if (Input.IsKeyPressed(Keys.Left))
+            {
+                if (currentTest > 0)
+                currentTest--;
+                Testbed.StartTest(currentTest);
+            }
+            if (Input.IsKeyPressed(Keys.Right))
+            {
+                if (currentTest < Testbed.TestEntries.Length - 1)
+                    currentTest++;
+                Testbed.StartTest(currentTest);
+            }
+
             Testbed.Update(gameTime);
 
             // TODO: Add your update logic here
 
+            oldState = newState;
+
+
+            Input.Update();
             base.Update(gameTime);
         }
 
@@ -96,7 +155,7 @@ namespace Testbed
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
             if (bSelectingTest)
                 Testbed.DrawTestList(spriteBatch);
@@ -107,5 +166,7 @@ namespace Testbed
 
             base.Draw(gameTime);
         }
+
+        
     }
 }

@@ -242,6 +242,136 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #endregion
 
+        #region extensions        
+        public void DrawRectangle(bool filled, Rectangle rectangle, float rotation, Color color)
+        {
+            DrawRectangle(filled, new Vector2(rectangle.Center.X, rectangle.Center.Y), new Vector2(rectangle.Height, rectangle.Width), rotation, color);
+        }
 
+        public void DrawRectangleFromPoints(bool filled, Vector2 topLeft, Vector2 bottomRight, float rotation, Color color)
+        {
+            DrawRectangle(filled, Vector2.Lerp(topLeft, bottomRight, 0.5f), bottomRight - topLeft, rotation, color);
+        }
+
+        public void DrawRectangle(bool filled, Vector2 centre, Vector2 size, float rotation, Color color)
+        {
+            //Quaternion quat = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, rotation);
+            //size = Vector2.Transform(size, quat);
+
+            Vector2 halfSize = size / 2;
+            Vector2 altHalfSize = new Vector2(halfSize.X, -halfSize.Y);
+
+            Quaternion quat = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, rotation);
+            halfSize = Vector2.Transform(halfSize, quat);
+            altHalfSize = Vector2.Transform(altHalfSize, quat);
+            //Vector2 topLeft = centre - halfSize;
+
+            //Matrix rot = Matrix.CreateRotationZ(rotation);
+
+            //size = Vector2.Transform(halfSize, quat);
+
+            if (filled)
+            {
+                Begin(PrimitiveType.TriangleList);
+
+                AddVertex(centre - halfSize, color);
+                AddVertex(centre + altHalfSize, color);
+                AddVertex(centre - altHalfSize, color);
+
+                AddVertex(centre + halfSize, color);
+                AddVertex(centre - altHalfSize, color);
+                AddVertex(centre + altHalfSize, color);
+
+
+                End();
+            }
+            else
+            {
+                Begin(PrimitiveType.LineList);
+                //top
+                AddVertex(centre - halfSize, color);
+                AddVertex(centre + altHalfSize, color);
+
+                AddVertex(centre + altHalfSize, color);
+                AddVertex(centre + halfSize, color);
+
+                AddVertex(centre + halfSize, color);
+                AddVertex(centre - altHalfSize, color);
+
+                AddVertex(centre - altHalfSize, color);
+                AddVertex(centre - halfSize, color);
+
+                End();
+            }
+        }
+
+        public void DrawRectangle(bool filled, Vector2 centre, float width, float height, float rotation, Color color)
+        {
+            DrawRectangle(filled, centre, new Vector2(width, height), rotation, color);
+        }
+
+        public void DrawCircle(Vector2 position, float radius, Color color)
+        {
+            Begin(PrimitiveType.LineList);
+            int steps = 20;
+            float step = MathHelper.TwoPi / steps;
+
+
+            for (int i = 0; i < (steps + 1); i++)
+            {
+                float x = radius * (float)Math.Cos(i * step);
+                float y = radius * (float)Math.Sin(i * step);
+
+                AddVertex(position + new Vector2(x, y), color);
+                if (i != 0)
+                    AddVertex(position + new Vector2(x, y), color);
+
+            }
+
+
+            End();
+        }
+
+        public void DrawFilledCircle(Vector2 position, float radius, Color color, int steps = 20)
+        {
+
+            Begin(PrimitiveType.TriangleList);            
+            float step = MathHelper.TwoPi / steps;
+
+
+            for (int i = 0; i < (steps + 1); i++)
+            {
+                float x = radius * (float)Math.Cos(i * step);
+                float y = radius * (float)Math.Sin(i * step);
+
+
+
+                if (i != 0)
+                {
+                    AddVertex(position + new Vector2(x, y), color);
+                }
+
+                if (i != steps)
+                {
+                    AddVertex(position, color);
+                    AddVertex(position + new Vector2(x, y), color);
+
+                }
+
+            }
+
+            End();
+        }
+        public void DrawLine(Vector2 start, Vector2 end, Color color)
+        {
+            Begin(PrimitiveType.LineList);
+
+            AddVertex(start, color);
+            AddVertex(end, color);
+
+            End();
+        }
+
+        #endregion
     }
 }

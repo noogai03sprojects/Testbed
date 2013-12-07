@@ -19,6 +19,8 @@ namespace Testbed
         public Game Game;
         protected GraphicsDevice Device;
 
+        protected SpriteFont Font;
+
         public Test(string Name, string Description, Game game)
         {
             Game = game;
@@ -39,7 +41,7 @@ namespace Testbed
 
         public virtual void LoadContent()
         {
-            
+            Font = Game1.Instance.Content.Load<SpriteFont>("Font");
         }
 
         public virtual void Unload()
