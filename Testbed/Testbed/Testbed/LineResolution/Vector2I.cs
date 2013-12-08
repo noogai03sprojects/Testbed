@@ -12,7 +12,7 @@ namespace Testbed
 
         public static Vector2I operator +(Vector2I v1, Vector2I v2)
         {
-            return new Vector2I(v1.X + v2.X, v1.Y + v2.X);
+            return new Vector2I(v1.X + v2.X, v1.Y + v2.Y);
         }
         public static Vector2I operator -(Vector2I v1, Vector2I v2)
         {
@@ -81,7 +81,7 @@ namespace Testbed
         {
             return new Vector2I((int)vect.X, (int)vect.Y);
         }
-        static public explicit operator Vector2(Vector2I vect)
+        static public implicit operator Vector2(Vector2I vect)
         {
             return new Vector2(vect.X, vect.Y);
         }
@@ -90,5 +90,7 @@ namespace Testbed
         {
             return (A.X * A.Y) + (B.X * B.Y);
         }
+
+        public static Vector2I Zero = new Vector2I(0, 0);
     }
 }

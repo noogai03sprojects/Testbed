@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Testbed.Physics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Testbed
 {
@@ -24,10 +25,12 @@ namespace Testbed
         float dot;
 
         AABB AABB;
+        Vector2I gravity = new Vector2I(0, 1);
+        Vector2I velocity;
 
         public override void Initialize()
         {
-            testLine = new Line(400, 100, 100, 400);
+            testLine = new Line(600, 300, 100, 400);
             AABB = new AABB(new Vector2I(10, 10), new Vector2I(110, 110));
             base.Initialize();
         }
@@ -35,15 +38,44 @@ namespace Testbed
         public override void Update(GameTime gameTime)
         {
             mousePos = Input.GetMousePos(Matrix.Identity);
-            //Vector2 normal = testLine.StartToEnd.Normal;
-            //normal.Normalize();
-            //Vector2 distance = (Vector2)testLine.Start - mousePos;
-            //distance.Normalize();
-            //dot = Vector2.Dot(normal, distance);
+            
             dot = testLine.DotFromPoint(mousePos);
-
+            
+            int moveSpeed = 4;
+            if (Input.IsKeyDown(Keys.A))
+            {
+                AABB.Move(new Vector2I(-1 * moveSpeed, 0));
+            }
+            if (Input.IsKeyDown(Keys.D))
+            {
+                AABB.Move(new Vector2I(1 * moveSpeed, 0));
+            }
+            if (Input.IsKeyDown(Keys.W))
+            {
+                AABB.Move(new Vector2I(0, -1 * moveSpeed));
+            }
+            if (Input.IsKeyDown(Keys.S))
+            {
+                AABB.Move(new Vector2I(0, 1 * moveSpeed));
+            }
+            if (Input.IsKeyPressed(Keys.Space))
+            {
+                velocity = new Vector2I(0, -20);
+            }
+            //Console.WriteLine(Input.GetLeftStick(PlayerIndex.One));
+            velocity += gravity;
+            AABB.Move(velocity);
+            Collisions();
             //Vector2 start
             base.Update(gameTime);
+        }
+
+        public void Collisions()
+        {
+            while (testLine.DotFromPoint(AABB.BottomRight) < 0)
+            {
+                AABB.Move(new Vector2I(0, -1));
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch, PrimitiveBatch primBatch)

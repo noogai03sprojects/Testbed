@@ -85,7 +85,7 @@ namespace Testbed
         {
             spriteBatch.Begin();
 
-            spriteBatch.DrawString(Font, toPrint, new Vector2(10, 10), Color.White);
+            spriteBatch.DrawString(Font, toPrint, new Vector2(10, 10), Color.Black);
 
             spriteBatch.End();
             base.Draw(spriteBatch, primBatch);

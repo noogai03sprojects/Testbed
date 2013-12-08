@@ -58,5 +58,31 @@ namespace Testbed.Physics
             distance.Normalize();
             return Vector2.Dot(normal, distance);            
         }
+
+        public static bool Intersects(Line A, Line B, out Vector2 intersection)
+        {
+            intersection = Vector2I.Zero;
+            Vector2 b = A.StartToEnd;
+            Vector2 d = B.StartToEnd;
+
+            float bDotDPerp = b.X * d.Y - b.Y * d.X;
+
+            // if b dot d == 0, it means the lines are parallel so have infinite intersection points
+            if (bDotDPerp == 0)
+                return false;
+
+            Vector2 c = B.Start - A.Start;
+            float t = (c.X * d.Y - c.Y * d.X) / bDotDPerp;
+            if (t < 0 || t > 1)
+                return false;
+
+            float u = (c.X * b.Y - c.Y * b.X) / bDotDPerp;
+            if (u < 0 || u > 1)
+                return false;
+
+            intersection = A.Start + t * b;
+
+            return true;
+        }        
     }
 }
