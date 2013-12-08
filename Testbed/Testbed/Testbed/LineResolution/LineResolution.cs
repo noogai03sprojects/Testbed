@@ -30,7 +30,7 @@ namespace Testbed
 
         public override void Initialize()
         {
-            testLine = new Line(600, 300, 100, 400);
+            testLine = new Line(600, 300, 100, 300);
             AABB = new AABB(new Vector2I(10, 10), new Vector2I(110, 110));
             base.Initialize();
         }
@@ -72,9 +72,13 @@ namespace Testbed
 
         public void Collisions()
         {
-            while (testLine.DotFromPoint(AABB.BottomRight) < 0)
+            if ((testLine.DotFromPoint(AABB.BottomRight) < 0) && (AABB.Intersects(testLine)) )
             {
-                AABB.Move(new Vector2I(0, -1));
+                while (testLine.DotFromPoint(AABB.BottomRight) < 0) 
+                {
+                    AABB.Move(new Vector2I(0, -1));
+                    velocity = Vector2I.Zero;
+                }
             }
         }
 

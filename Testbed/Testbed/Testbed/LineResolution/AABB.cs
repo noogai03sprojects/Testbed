@@ -175,13 +175,100 @@ namespace Testbed.Physics
         }
         public bool Intersects(Line line)
         {            
-            SunderlandCell A = CalculateSunderlandCell(line.Start);
-            SunderlandCell B = CalculateSunderlandCell(line.End);
+            //SunderlandCell A = CalculateSunderlandCell(line.Start);
+            //SunderlandCell B = CalculateSunderlandCell(line.End);
 
-            if (A == B)
+            //if (A == B)
+            //{
+            //    return false;
+            //}
+            //int cellTotal = (int)A + (int)B;
+            //if (cellTotal < 4)            
+            //    return false;
+            //if (cellTotal > 9)
+            //    return false;
+            
+            
+            //return true;
+            return SegmentIntersectRectangle(UpperBound.X, UpperBound.Y, LowerBound.X, LowerBound.Y, line.Start.X, line.Start.Y, line.End.X, line.End.Y);
+            }
+
+        static bool SegmentIntersectRectangle(int a_rectangleMinX,
+                                 int a_rectangleMinY,
+                                 int a_rectangleMaxX,
+                                 int a_rectangleMaxY,
+                                 int a_p1x,
+                                 int a_p1y,
+                                 int a_p2x,
+                                 int a_p2y)
+        {
+            // Find min and max X for the segment
+
+            int minX = a_p1x;
+            int maxX = a_p2x;
+
+            if (a_p1x > a_p2x)
+            {
+                minX = a_p2x;
+                maxX = a_p1x;
+            }
+
+            // Find the intersection of the segment's and rectangle's x-projections
+
+            if (maxX > a_rectangleMaxX)
+            {
+                maxX = a_rectangleMaxX;
+            }
+
+            if (minX < a_rectangleMinX)
+            {
+                minX = a_rectangleMinX;
+            }
+
+            if (minX > maxX) // If their projections do not intersect return false
             {
                 return false;
             }
+
+            // Find corresponding min and max Y for min and max X we found before
+
+            int minY = a_p1y;
+            int maxY = a_p2y;
+
+            int dx = a_p2x - a_p1x;
+
+            if (dx == 0)//Math.Abs(dx) > 0.0000001)
+            {
+                int a = (a_p2y - a_p1y) / dx;
+                int b = a_p1y - a * a_p1x;
+                minY = a * minX + b;
+                maxY = a * maxX + b;
+            }
+
+            if (minY > maxY)
+            {
+                int tmp = maxY;
+                maxY = minY;
+                minY = tmp;
+            }
+
+            // Find the intersection of the segment's and rectangle's y-projections
+
+            if (maxY > a_rectangleMaxY)
+            {
+                maxY = a_rectangleMaxY;
+            }
+
+            if (minY < a_rectangleMinY)
+            {
+                minY = a_rectangleMinY;
+            }
+
+            if (minY > maxY) // If Y-projections do not intersect return false
+            {
+                return false;
+            }
+
             return true;
         }
     }
